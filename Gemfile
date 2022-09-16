@@ -62,7 +62,7 @@ group :development do
   gem 'devise', '~> 4.8', '>= 4.8.1'
   gem 'figaro'
   gem 'gravatar_image_tag', '~> 1.2'
-  gem 'mini_magick', '~> 4.11'
+  gem "mini_magick"
   gem 'sidekiq', '~> 6.5', '>= 6.5.6'
   gem 'simple_form', '~> 5.1'
   gem 'stripe', '~> 7.1'
