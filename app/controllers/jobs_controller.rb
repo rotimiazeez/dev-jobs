@@ -1,20 +1,19 @@
 class JobsController < ApplicationController
-  before_action :set_job, only: [:show, :edit, :update, :destroy]
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :set_job, only: %i[show edit update destroy]
+  before_action :authenticate_user!, except: %i[index show]
   # GET /jobs
   # GET /jobs.json
   def index
-    if(params.has_key?(:job_type))
-      @jobs = Job.where(job_type: params[:job_type]).order("created_at desc")
-    else
-      @jobs = Job.all.order("created_at desc")
-    end
+    @jobs = if params.key?(:job_type)
+              Job.where(job_type: params[:job_type]).order('created_at desc')
+            else
+              Job.all.order('created_at desc')
+            end
   end
 
   # GET /jobs/1
   # GET /jobs/1.json
-  def show
-  end
+  def show; end
 
   # GET /jobs/new
   def new
@@ -22,8 +21,7 @@ class JobsController < ApplicationController
   end
 
   # GET /jobs/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /jobs
   # POST /jobs.json
@@ -35,15 +33,15 @@ class JobsController < ApplicationController
     job_title = params[:title]
     card_brand = params[:user][:card_brand]
     card_exp_month = params[:user][:card_exp_month]
-    card_exp_year  = params[:user][:card_exp_year]
+    card_exp_year = params[:user][:card_exp_year]
     card_last4 = params[:user][:card_last4]
 
     charge = Stripe::Charge.create(
-      :amount => 30000,
-      :currency => "usd",
-      :description => job_type,
-      :statement_descriptor => job_title,
-      :source => token
+      amount: 30_000,
+      currency: 'usd',
+      description: job_type,
+      statement_descriptor: job_title,
+      source: token
     )
 
     current_user.stripe_id = charge.id
@@ -62,10 +60,9 @@ class JobsController < ApplicationController
         format.json { render json: @job.errors, status: :unprocessable_entity }
       end
     end
-
-    rescue Stripe::CardError => e
-      flash.alert = e.message
-      render action: :new
+  rescue Stripe::CardError => e
+    flash.alert = e.message
+    render action: :new
   end
 
   # PATCH/PUT /jobs/1
@@ -93,13 +90,15 @@ class JobsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_job
-      @job = Job.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def job_params
-      params.require(:job).permit(:title, :description, :url, :job_type, :location, :job_author, :remote_ok, :apply_url, :avatar)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_job
+    @job = Job.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def job_params
+    params.require(:job).permit(:title, :description, :url, :job_type, :location, :job_author, :remote_ok,
+                                :apply_url, :avatar)
+  end
 end
